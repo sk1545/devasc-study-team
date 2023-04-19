@@ -1,0 +1,67 @@
+---
+
+# SID: 2004412 - MOD006365
+
+# The purpose of this play book it to...
+
+# 1. Disable DNS lookup to prevent the router from attempting to translate incorrectly entered commands as though they were host names.
+# 2. Assign class as the privileged EXEC encrypted password.
+# 3. Assign cisco as the console password and enable login.
+# 4. Encrypt the plaintext passwords.
+# 5. Create a banner that warns anyone accessing the device that unauthorized access is prohibited.
+# 6. Create a default static route that exits via interface loopback0
+
+- hosts: CSR1kv
+  connection: local
+  gather_facts: false
+  # Above line is set to false, so that information about the CSR1000v router isn't gathered for any commands are executed.
+
+  vars:
+    class_password: "class"
+    console_password: "cisco"
+    # Above code is keys and their values which will be called upon later in the file.
+
+  tasks:
+  - name: DISABLE DNS LOOKUP
+    ios_config:
+      lines:
+      - no ip domain-lookup
+    register: result
+    # Above code is a task to disable DNS lookup on the CSR1000v router using the "no ip domain lookup" command on the router.
+
+  - name: SET PRIVILEGE EXEC PASSWORD
+    ios_config:
+      lines:
+      - enable secret {{ class_password }}
+    register: result
+    # Above code is a task to set the privilege exec password to the key "class_password" which has the value "class" above in the file.
+  
+  - name: SET CONSOLE PASSWORD
+    ios_config:
+      lines:
+      - line console 0
+      - login
+      - password {{ console_password }}
+    register: result
+    # Above code is a task to set the console password to the key "console_password" which has the value "cisco" above in the file.
+
+  - name: ENCRYPT PLAINTEXT PASSWORDS
+    ios_config:
+      lines:
+      - service password-encryption
+    register: result
+    # Above code is a task to enxrypt passwords on the CSR1000v router.
+
+  - name: CREATE MOTD BANNER
+    ios_config:
+      lines:
+      - banner motd ^ Unauthorized Access Is Strictly Prohibited ^
+    register: result
+    # Above code is a task to set the message of the day on the CSR1000v router.
+
+  - name: CREATE DEFAULT ROUTE
+    ios_config:
+      lines:
+      - ip route 0.0.0.0 0.0.0.0 loopback0
+    register: result
+    # Above code is a task to create a default route on the loopback interface on router CSR1000v.

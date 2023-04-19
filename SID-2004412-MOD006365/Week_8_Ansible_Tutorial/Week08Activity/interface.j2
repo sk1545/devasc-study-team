@@ -1,0 +1,11 @@
+{% if interface is defined %}
+{% for i in interface %}
+{% set _i = interface[i] %}
+!
+interface {{ i }}
+{% if _i['desc'] is defined %}
+description {{ _i['desc'] }}
+{% endif %}
+ip address {{ _i['ip'] }} {{ _i['mask'] }}
+{% endfor %}
+{% endif %}

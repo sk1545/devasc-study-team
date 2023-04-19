@@ -1,0 +1,14 @@
+---
+
+# SID: 2004412 - MOD006365
+
+# The is a YAML file containing CSR1000v router configuration with Loopback interfaces including IP Addresses, Subnet Masks, and Descriptions
+
+interface:
+  Loopback0:
+    ip: 1.1.1.1
+    mask: 255.255.255.255
+  Loopback1:
+    ip: 10.0.1.1
+    mask: 255.255.255.252
+    desc: TO_ISP_A

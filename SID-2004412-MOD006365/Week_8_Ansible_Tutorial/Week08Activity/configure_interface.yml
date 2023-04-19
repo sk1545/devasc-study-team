@@ -1,0 +1,36 @@
+---
+
+# SID: 2004412 - MOD006365
+
+# This is a YAML file containing a Ansible Playbook to run the task for generating commands using templates
+
+- name: INTERFACE
+  # The name of this Playbook is "INTERFACE"
+  hosts: CSR1kv
+  gather_facts: false
+  # Above line is set to false, so that information about the CSR1000v router isn't gathered for any commands are executed.
+  connection: local
+
+  tasks:
+    - name: generate interface config
+      # The name of this task is "generate interface config"
+      template:
+        src="interface.j2"
+        dest="config/{{ inventory_hostname }}_interface.txt"
+      register: interface
+      # Above code is using the template Ansible Module looking for the file named interface.j2
+      # The generated output file will be stored in the "config/" folder with the name CSR1kv_interface.txt
+
+    - name: push configuration
+      ios_config:
+        src: "config/{{ inventory_hostname }}_interface.txt"
+      notify: do wr
+      when: interface.changed
+      # The Above task is to push the configuration. This task uses the "ios_config" Ansible module.
+      # The task will look for auto generated interface configuraiton file stored in "config/{{ inventory_hostname }}_interface.txt" and push the commands to the CSR1000v router.
+      # The task has a condition that only executes when the task registers as interface has a status of "changed"
+
+  handlers:
+    - name: do wr
+      ios_command:
+        commands: wr
